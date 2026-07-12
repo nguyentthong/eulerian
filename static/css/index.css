@@ -1,0 +1,185 @@
+/* ---- nerfies base ---- */
+body {
+  font-family: 'Noto Sans', sans-serif;
+}
+
+.footer .icon-link {
+  font-size: 25px;
+  color: #000;
+}
+
+.link-block a {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.teaser .hero-body {
+  padding-top: 0;
+  padding-bottom: 3rem;
+}
+.teaser {
+  font-family: 'Google Sans', sans-serif;
+}
+
+.publication-title {
+  font-family: 'Google Sans', sans-serif;
+}
+.publication-authors {
+  font-family: 'Google Sans', sans-serif;
+}
+.publication-venue {
+  color: #555;
+  width: fit-content;
+  font-weight: bold;
+}
+.publication-authors a {
+  color: hsl(204, 86%, 53%) !important;
+}
+.publication-authors a:hover {
+  text-decoration: underline;
+}
+.author-block {
+  display: inline-block;
+}
+.publication-links {
+  margin-top: 1.25rem;
+}
+
+/* corresponding-author / email line */
+.author-email {
+  margin-top: 0.5rem;
+  font-family: 'Google Sans', sans-serif;
+}
+.author-email a { color: hsl(204, 86%, 53%); }
+.author-note { color: #777; }
+
+/* ---- media cards ---- */
+.clip {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  border: 1px solid #e3e3e3;
+  background: #0b0f16;
+}
+.figframe img {
+  width: 100%;
+  border-radius: 8px;
+}
+.figframe.diagram img {
+  background: #fff;
+}
+.media-caption {
+  font-size: 0.92rem;
+  color: #555;
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
+.media-label {
+  display: inline-block;
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-top: 0.55rem;
+}
+.media-label.base { background: #fdecdc; color: #b5651a; }
+.media-label.ours { background: #d9f2ee; color: #0a7d6f; }
+
+/* ---- results tables ---- */
+.result-table { width: 100%; font-size: 0.85rem; }
+.result-table th, .result-table td {
+  text-align: right;
+  white-space: nowrap;
+  padding: 0.45rem 0.7rem;
+  font-variant-numeric: tabular-nums;
+}
+.result-table th:first-child, .result-table td:first-child { text-align: left; }
+.result-table thead th {
+  border-bottom: 2px solid #dbdbdb;
+  font-family: 'Google Sans', sans-serif;
+  font-weight: 600;
+  color: #555;
+}
+.result-table tbody tr.is-ours {
+  background: #eafaf6;
+  font-weight: 700;
+}
+.result-table tbody tr.is-ours td:first-child {
+  border-left: 3px solid #0a9484;
+}
+.result-table .ci { color: #999; font-weight: 400; font-size: 0.78rem; }
+.table-scroll { overflow-x: auto; }
+
+/* ---- stat tiles ---- */
+.stat-tile {
+  background: #fff;
+  border: 1px solid #ededed;
+  border-radius: 10px;
+  padding: 1.1rem 1.2rem;
+  height: 100%;
+}
+.stat-num {
+  font-family: 'Google Sans', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1b1b1b;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.stat-num small { font-size: 0.5em; color: #888; font-weight: 400; }
+.stat-what { font-size: 0.9rem; font-weight: 600; color: #333; margin-top: 0.4rem; }
+.stat-how { font-size: 0.8rem; color: #777; margin-top: 0.2rem; }
+
+/* ---- efficiency chart ---- */
+#effchart { width: 100%; height: auto; display: block; }
+#effchart text { font-family: 'Noto Sans', sans-serif; font-size: 11px; fill: #777; }
+#effchart .grid { stroke: #e6e6e6; stroke-width: 1; }
+#effchart .dl { font-size: 12px; font-weight: 600; }
+.chart-legend { display: flex; gap: 1.4rem; font-size: 0.85rem; color: #444; margin-bottom: 0.4rem; flex-wrap: wrap; }
+.chart-legend .sw { display: inline-block; width: 16px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+
+.disclosure {
+  font-size: 0.82rem;
+  color: #888;
+  margin-top: 1rem;
+  font-style: italic;
+}
+
+pre code { font-size: 0.85rem; }
+
+/* ---- overview: Lagrangian vs Eulerian animated demo ---- */
+.demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin: 1.75rem 0 1rem; }
+@media (max-width: 768px) { .demo-grid { grid-template-columns: 1fr; } }
+.demo-card {
+  background: #fff; border: 1px solid #ececec; border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05); padding: 1.1rem 1.2rem 1rem;
+}
+.demo-head { display: flex; align-items: baseline; gap: .7rem; margin-bottom: .7rem; flex-wrap: wrap; }
+.demo-head h3 { font-family: 'Google Sans', sans-serif; font-size: 1.1rem; font-weight: 600; color: #1b1b1b; }
+.demo-head .tag {
+  font-family: 'Google Sans', sans-serif; font-size: .68rem; letter-spacing: .06em;
+  text-transform: uppercase; padding: 3px 10px; border-radius: 999px;
+}
+.tag.lag { background: #fdecdc; color: #b5651a; }
+.tag.eul { background: #d9f2ee; color: #0a7d6f; }
+.demo-card canvas { width: 100%; height: auto; border-radius: 8px; background: #f6f7f9; display: block; }
+.demo-card p { font-size: .9rem; color: #666; margin-top: .7rem; line-height: 1.5; }
+.errbar { display: flex; align-items: center; gap: .6rem; margin-top: .8rem; }
+.errbar .lbl { font-family: 'Google Sans', sans-serif; font-size: .7rem; color: #888; letter-spacing: .03em; white-space: nowrap; }
+.errbar .track { flex: 1; height: 6px; border-radius: 3px; background: #eee; overflow: hidden; }
+.errbar .fill { height: 100%; border-radius: 3px; width: 8%; transition: width .12s linear; }
+.errbar.lag .fill { background: #c77414; }
+.errbar.eul .fill { background: #0a9484; }
+.contribs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin-top: 1.2rem; }
+@media (max-width: 768px) { .contribs { grid-template-columns: 1fr; } }
+.contrib { background: #fff; border: 1px solid #ececec; border-radius: 10px; padding: 1.3rem 1.2rem; }
+.contrib .k { font-family: 'Google Sans', sans-serif; font-style: italic; font-size: .85rem; color: #0a7d6f; display: block; margin-bottom: .5rem; }
+.contrib h3 { font-family: 'Google Sans', sans-serif; font-size: 1.05rem; font-weight: 600; color: #1b1b1b; margin-bottom: .4rem; }
+.contrib p { font-size: .9rem; color: #666; line-height: 1.5; }
+
+/* ---- title sizing ---- */
+.title.is-1.publication-title { font-size: 2.3rem; line-height: 1.2; }
+.title.is-3.overview-title { font-size: 1.5rem; }

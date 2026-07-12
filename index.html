@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+    content="Eulerian Motion Guidance: robust, drift-free image animation via adjacent-frame motion fields and Bidirectional Geometric Consistency. ACM Multimedia 2026.">
+  <meta name="keywords" content="Image Animation, Motion Guidance, Geometric Consistency, Diffusion Models">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eulerian Motion Guidance: Robust Image Animation via Bidirectional Geometric Consistency</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+</head>
+
+<body>
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">Eulerian Motion Guidance: Robust Image Animation via Bidirectional
+              Geometric Consistency</h1>
+            <h2 class="subtitle is-4 publication-venue" style="margin: 0 auto 1rem;">ACM Multimedia 2026 &middot; Rio de
+              Janeiro</h2>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">Thong Nguyen<sup>*</sup>,</span>
+              <span class="author-block">Khoi M. Le,</span>
+              <span class="author-block">Cong-Duy Nguyen,</span>
+              <span class="author-block">Luu Anh Tuan,</span>
+              <span class="author-block">See-Kiong Ng,</span>
+              <span class="author-block">Chunyan Miao</span>
+            </div>
+
+            <div class="is-size-5 publication-authors" style="margin-top: 0.6rem;">
+              <span class="author-block">National University of Singapore</span>&nbsp;&middot;&nbsp;
+              <span class="author-block">VinUniversity</span>&nbsp;&middot;&nbsp;
+              <span class="author-block">Nanyang Technological University</span>
+            </div>
+
+            <div class="is-size-6 author-email" style="margin-top: 0.6rem;">
+              </sup>Corresponding Author: </span>
+              <a href="mailto:thong.nguyen@nus.edu.sg">thong.nguyen@nus.edu.sg</a>
+            </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <span class="link-block">
+                  <a href="static/paper.pdf" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                    <span>Paper</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="https://arxiv.org" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="ai ai-arxiv"></i></span>
+                    <span>arXiv</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="https://github.com" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="fab fa-github"></i></span>
+                    <span>Code</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="#BibTeX" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="fas fa-quote-left"></i></span>
+                    <span>BibTeX</span>
+                  </a>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Teaser -->
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <img class="clip" src="static/videos/showcase_01.gif"
+          alt="Image animation generated with Eulerian Motion Guidance">
+        <h2 class="subtitle has-text-centered" style="margin-top: 1rem;">
+          <strong>Eulerian Motion Guidance</strong> animates a single image into a coherent 100-frame video &mdash;
+          bounded-error motion supervision keeps structure and texture stable over long horizons.
+        </h2>
+      </div>
+    </div>
+  </section>
+
+  <!-- Abstract -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Recent advancements in image animation have utilized diffusion models to breathe life into
+              static images. However, existing controllable frameworks typically rely on <em>Lagrangian</em>
+              motion guidance, where optical flow is estimated relative to the initial frame. This paper
+              revisits the same optical-flow primitive through a more local supervision design: we use
+              adjacent-frame <em>Eulerian</em> motion fields to guide generation, where the motion signal
+              always describes a short temporal hop. This shift enables parallelized training and provides
+              bounded-error supervision throughout the generation process. To mitigate the drift artifacts
+              common in adjacent-frame generation, we introduce a <strong>Bidirectional Geometric
+                Consistency</strong> mechanism, which computes a forward&ndash;backward cycle check to
+              mathematically identify and mask occluded regions, preventing the model from learning
+              incorrect warping objectives. Extensive experiments demonstrate that our approach accelerates
+              training, preserves temporal coherence, and reduces dynamic artifacts compared to
+              reference-based baselines.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Overview -->
+  <section class="section" style="padding-top: 0;" id="overview">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered overview-title">Motion guidance should describe the next step, not the whole journey</h2>
+      <div class="content has-text-justified">
+        <p>
+          Controllable image-animation frameworks typically rely on <strong>Lagrangian</strong> motion
+          guidance: optical flow estimated relative to the initial frame. As the animation unfolds,
+          displacements grow, brightness-constancy assumptions break, and valid correspondences vanish
+          behind occlusions &mdash; so the supervision itself becomes noisy exactly when the model needs
+          it most.
+        </p>
+        <p>
+          We revisit the same optical-flow primitive through a more local supervision design.
+          <strong>Eulerian Motion Guidance (EMG)</strong> supervises generation with adjacent-frame
+          motion fields, so the signal always describes a short temporal hop that stays inside the
+          reliable, short-range regime of flow estimators &mdash; provably bounding per-step supervisory
+          error. To stop stochastic drift in newly revealed regions, a <strong>Bidirectional Geometric
+          Consistency (BGC)</strong> check computes forward&ndash;backward cycle energy and masks occluded
+          pixels out of the loss, so the model is only ever supervised by geometrically valid
+          correspondences.
+        </p>
+      </div>
+
+      <div class="demo-grid" id="demo">
+        <div class="demo-card">
+          <div class="demo-head">
+            <span class="tag lag">Prior work</span>
+            <h3>Lagrangian guidance</h3>
+          </div>
+          <canvas id="lagCanvas" width="520" height="330" role="img"
+            aria-label="Animation showing a long flow vector anchored to the first frame accumulating error as displacement grows"></canvas>
+          <div class="errbar lag"><span class="lbl">supervisory error</span>
+            <div class="track">
+              <div class="fill" id="lagErr"></div>
+            </div>
+          </div>
+          <p>Flow is anchored to the reference frame <b>I&#8320;</b>. The vector grows with time, drifting
+            outside the estimator&rsquo;s reliable range &mdash; error accumulates without bound.</p>
+        </div>
+        <div class="demo-card">
+          <div class="demo-head">
+            <span class="tag eul">Ours</span>
+            <h3>Eulerian guidance</h3>
+          </div>
+          <canvas id="eulCanvas" width="520" height="330" role="img"
+            aria-label="Animation showing short adjacent-frame flow vectors that stay small and accurate over time"></canvas>
+          <div class="errbar eul"><span class="lbl">supervisory error</span>
+            <div class="track">
+              <div class="fill" id="eulErr"></div>
+            </div>
+          </div>
+          <p>Flow is measured between consecutive frames <b>I&#8348; &rarr; I&#8348;&#8330;&#8321;</b>. Every
+            supervision step is a short hop with bounded error &mdash; regardless of sequence length.</p>
+        </div>
+      </div>
+
+      <div class="contribs">
+        <div class="contrib">
+          <span class="k">Theory</span>
+          <h3>Bounded-error supervision</h3>
+          <p>A formal analysis of error propagation in reference-anchored flow, and an Eulerian
+            alternative whose per-step supervisory error stays bounded over arbitrarily long horizons.</p>
+        </div>
+        <div class="contrib">
+          <span class="k">Mechanism</span>
+          <h3>Bidirectional Geometric Consistency</h3>
+          <p>A forward&ndash;backward cycle check derives an occlusion mask that gates unreliable gradients
+            in dis-occluded regions, eliminating ghosting and warping artifacts.</p>
+        </div>
+        <div class="contrib">
+          <span class="k">Systems</span>
+          <h3>Parallelized flow computation</h3>
+          <p>Adjacent-frame formulation admits batched flow estimation &mdash; O(1) iteration time in
+            sequence length, a 2.7&times; training speedup at T = 24 on frozen SVD backbones.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Method -->
+  <section class="section" style="padding-top: 0;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-full">
+          <h2 class="title is-3 has-text-centered">Method</h2>
+          <div class="content has-text-justified">
+            <p>
+              Ground-truth frames pass through a frozen sparse-to-dense network and a trainable
+              <strong>FlowControlNet</strong> that injects Eulerian motion features into a frozen Stable
+              Video Diffusion backbone. Motion fields for all adjacent pairs are estimated in one batched
+              pass, and the geometric-consistency loss is applied only where the occlusion mask certifies a
+              valid correspondence.
+            </p>
+          </div>
+
+          <div class="figframe diagram">
+            <img src="static/images/overall_paradigm.png"
+              alt="Overall EMG architecture: video frames feed a frozen sparse-to-dense network and trainable FlowControlNet; Eulerian motion fields supervise a frozen SVD backbone through an occlusion-masked geometric consistency loss.">
+          </div>
+          <p class="media-caption has-text-centered">
+            <strong>Overall paradigm.</strong> Adjacent-frame Eulerian motion fields guide a frozen SVD
+            backbone through the trainable FlowControlNet; the geometric-consistency loss &#8466;<sub>geo</sub>
+            is gated by the occlusion mask <em>M</em><sub>occ</sub> derived from forward&ndash;backward cycle energy.
+          </p>
+
+          <div class="figframe diagram" style="margin-top: 2rem;">
+            <img src="static/images/occlusion_mask.jpg"
+              alt="Bidirectional geometric consistency: forward and backward flows between consecutive frames produce a cycle-energy map, from which a validity mask removes occluded regions from the loss.">
+          </div>
+          <p class="media-caption has-text-centered">
+            <strong>Bidirectional Geometric Consistency.</strong> Forward and backward flows between
+            <em>I</em><sub>t</sub> and <em>I</em><sub>t+1</sub> yield a cycle energy
+            <em>E</em><sub>cycle</sub>; pixels whose cycle error exceeds a motion-adaptive threshold are
+            masked so dis-occluded regions never contribute incorrect warping supervision.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Showcase -->
+  <section class="hero is-light is-small">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3 has-text-centered">Generated with EMG</h2>
+        <div class="columns">
+          <div class="column">
+            <img class="clip" src="static/videos/showcase_01.gif"
+              alt="Generated animation of a red cartoon character waving a steak">
+            <span class="media-label ours">Character</span>
+            <p class="media-caption"><strong>Identity preservation.</strong> Structure and texture stay intact under
+              large articulated motion.</p>
+          </div>
+          <div class="column">
+            <img class="clip" src="static/videos/showcase_02.gif" alt="Generated animation of a boat crossing a river">
+            <span class="media-label ours">Scene</span>
+            <p class="media-caption"><strong>Complex dynamics.</strong> Boat, wake, and water reflections stay coherent
+              over the full horizon.</p>
+          </div>
+          <div class="column">
+            <img class="clip" src="static/videos/showcase_03.gif" alt="Generated animation of a baker shaping dough">
+            <span class="media-label ours">Occlusion</span>
+            <p class="media-caption"><strong>Dis-occlusion under hand motion.</strong> Dough is pressed and revealed
+              &mdash; no ghosting or hallucinated objects.</p>
+          </div>
+        </div>
+        <p class="disclosure has-text-centered">Showcase clips are motion renderings from the paper&rsquo;s reference
+          frames.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparisons -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Long horizons without drift</h2>
+      <div class="content has-text-justified">
+        <p>
+          Reference-anchored baselines degrade as temporal distance grows &mdash; texture drift, identity
+          collapse, hallucinated objects in dis-occluded regions. Watch the same input side by side: the
+          baseline drifts, smears, and loses structure as the horizon grows, while EMG stays sharp and
+          geometrically stable.
+        </p>
+      </div>
+
+      <div class="columns">
+        <div class="column">
+          <img class="clip" src="static/videos/cmp_mofa_baseline.gif"
+            alt="MOFA baseline: the car body progressively warps and smears">
+          <span class="media-label base">MOFA &middot; Lagrangian</span>
+        </div>
+        <div class="column">
+          <img class="clip" src="static/videos/cmp_mofa_ours.gif" alt="EMG: the same car stays geometrically intact">
+          <span class="media-label ours">EMG &middot; Ours</span>
+        </div>
+      </div>
+      <p class="media-caption"><strong>Long-horizon behavior vs. MOFA.</strong> Error accumulation in reference-anchored
+        flow progressively warps and smears the scene; EMG keeps the car&rsquo;s shape and texture across the full
+        sequence.</p>
+
+      <div class="columns" style="margin-top: 1.5rem;">
+        <div class="column">
+          <img class="clip" src="static/videos/cmp_conductor_baseline.gif"
+            alt="ImageConductor baseline: the jet-ski rider dissolves into blur">
+          <span class="media-label base">ImageConductor</span>
+        </div>
+        <div class="column">
+          <img class="clip" src="static/videos/cmp_conductor_ours.gif"
+            alt="EMG: the rider's geometry stays intact against fast-moving water">
+          <span class="media-label ours">EMG &middot; Ours</span>
+        </div>
+      </div>
+      <p class="media-caption"><strong>Trajectory control vs. ImageConductor.</strong> Both methods follow the same
+        user-drawn trajectory. The baseline&rsquo;s rider progressively dissolves into blur and the scene loses
+        structure; EMG keeps the rider&rsquo;s geometry against the fast-moving water.</p>
+
+      <div class="columns" style="margin-top: 1.5rem;">
+        <div class="column">
+          <img class="clip" src="static/videos/portrait_baseline.gif"
+            alt="FactorPortrait baseline: the dis-occluded mouth region progressively blurs">
+          <span class="media-label base">FactorPortrait</span>
+        </div>
+        <div class="column">
+          <img class="clip" src="static/videos/portrait_ours.gif" alt="EMG: sharp mouth detail with stable identity">
+          <span class="media-label ours">EMG &middot; Ours</span>
+        </div>
+      </div>
+      <p class="media-caption"><strong>Keypoint-driven portrait animation vs. FactorPortrait.</strong> The baseline
+        progressively blurs the dis-occluded mouth region and identity degrades. EMG&rsquo;s Eulerian flux propagates
+        texture from adjacent frames, keeping mouth detail sharp and identity stable.</p>
+
+      <p class="disclosure">Clips are illustrative reconstructions rendered from the paper&rsquo;s reference frames to
+        visualize the behavior documented in the paper&rsquo;s figures and tables; the original method outputs are in
+        the paper.</p>
+    </div>
+  </section>
+
+  <!-- Quantitative results -->
+  <section class="section" style="padding-top: 0;">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">State-of-the-art results</h2>
+      <div class="content has-text-justified">
+        <p>
+          Evaluated on 100-frame generations &mdash; WebVid trajectory animation (1,000 test clips) and
+          keypoint-driven portrait animation &mdash; against ten recent controllable baselines, under
+          identical protocols.
+        </p>
+      </div>
+
+      <div class="columns is-multiline">
+        <div class="column is-3">
+          <div class="stat-tile">
+            <div class="stat-num">76.18</div>
+            <div class="stat-what">FVD &darr; &middot; trajectory</div>
+            <div class="stat-how">vs. 79.20 for the strongest baseline</div>
+          </div>
+        </div>
+        <div class="column is-3">
+          <div class="stat-tile">
+            <div class="stat-num">1.84<small>&times;10&#8315;&sup3;</small></div>
+            <div class="stat-what">Warping error &darr;</div>
+            <div class="stat-how">27% below next best</div>
+          </div>
+        </div>
+        <div class="column is-3">
+          <div class="stat-tile">
+            <div class="stat-num">94.4<small>%</small></div>
+            <div class="stat-what">User-study win rate &uarr;</div>
+            <div class="stat-how">preferred vs. every baseline</div>
+          </div>
+        </div>
+        <div class="column is-3">
+          <div class="stat-tile">
+            <div class="stat-num">2.7<small>&times;</small></div>
+            <div class="stat-what">Training speedup</div>
+            <div class="stat-how">315 ms &rarr; 115 ms per iter</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="title is-5" style="margin-top: 1.5rem;">Trajectory-based animation &middot; WebVid test set</h3>
+      <div class="table-scroll">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>Backbone</th>
+              <th>LPIPS &darr;</th>
+              <th>FID &darr;</th>
+              <th>FVD &darr;</th>
+              <th>CLIP-Cons &uarr;</th>
+              <th>E<sub>warp</sub> &darr;</th>
+              <th>Pref. &uarr;</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>DragNUWA</td>
+              <td>SVD</td>
+              <td>0.2705</td>
+              <td>19.66</td>
+              <td>91.38</td>
+              <td>0.9302</td>
+              <td>4.12</td>
+              <td>89.2 <span class="ci">[85.1, 93.3]</span></td>
+            </tr>
+            <tr>
+              <td>PoseTraj</td>
+              <td>SVD</td>
+              <td>0.1704</td>
+              <td>12.22</td>
+              <td>77.69</td>
+              <td>0.9562</td>
+              <td>2.58</td>
+              <td>63.5 <span class="ci">[58.2, 68.8]</span></td>
+            </tr>
+            <tr>
+              <td>MOFA</td>
+              <td>SVD</td>
+              <td>0.2274</td>
+              <td>16.82</td>
+              <td>86.76</td>
+              <td>0.9390</td>
+              <td>3.45</td>
+              <td>78.4 <span class="ci">[73.5, 83.3]</span></td>
+            </tr>
+            <tr>
+              <td>SG-I2V</td>
+              <td>SVD</td>
+              <td>0.2490</td>
+              <td>18.24</td>
+              <td>89.07</td>
+              <td>0.9346</td>
+              <td>3.81</td>
+              <td>82.1 <span class="ci">[77.5, 86.7]</span></td>
+            </tr>
+            <tr>
+              <td>I2VControl</td>
+              <td>MagicVideo-V2</td>
+              <td>0.2132</td>
+              <td>14.52</td>
+              <td>82.23</td>
+              <td>0.9476</td>
+              <td>3.10</td>
+              <td>71.3 <span class="ci">[66.1, 76.5]</span></td>
+            </tr>
+            <tr>
+              <td>AnyTraj</td>
+              <td>DiT</td>
+              <td>0.1989</td>
+              <td>13.75</td>
+              <td>80.71</td>
+              <td>0.9505</td>
+              <td>2.76</td>
+              <td>68.7 <span class="ci">[63.2, 74.2]</span></td>
+            </tr>
+            <tr>
+              <td>ImageConductor</td>
+              <td>AnimateDiff</td>
+              <td>0.1847</td>
+              <td>12.98</td>
+              <td>79.20</td>
+              <td>0.9534</td>
+              <td>2.51</td>
+              <td>65.2 <span class="ci">[59.8, 70.6]</span></td>
+            </tr>
+            <tr class="is-ours">
+              <td>EMG (ours)</td>
+              <td>SVD</td>
+              <td>0.1562</td>
+              <td>11.45</td>
+              <td>76.18</td>
+              <td>0.9591</td>
+              <td>1.84</td>
+              <td>92.3 <span class="ci">[87.1, 97.5]</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="title is-5" style="margin-top: 2rem;">Keypoint-based portrait animation</h3>
+      <div class="table-scroll">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>CPBD &uarr;</th>
+              <th>ArcFace &uarr;</th>
+              <th>CLIP-Cons &uarr;</th>
+              <th>E<sub>warp</sub> &darr;</th>
+              <th>Pref. &uarr;</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>SadTalker</td>
+              <td>0.3218</td>
+              <td>0.9188</td>
+              <td>0.9156</td>
+              <td>3.88</td>
+              <td>88.5 <span class="ci">[84.1, 92.9]</span></td>
+            </tr>
+            <tr>
+              <td>MagicAnimate</td>
+              <td>0.3852</td>
+              <td>0.9241</td>
+              <td>0.9288</td>
+              <td>2.95</td>
+              <td>83.7 <span class="ci">[78.5, 88.4]</span></td>
+            </tr>
+            <tr>
+              <td>Cinemo</td>
+              <td>0.3986</td>
+              <td>0.9315</td>
+              <td>0.9342</td>
+              <td>2.61</td>
+              <td>77.1 <span class="ci">[71.8, 82.3]</span></td>
+            </tr>
+            <tr>
+              <td>MOFA</td>
+              <td>0.4075</td>
+              <td>0.9293</td>
+              <td>0.9390</td>
+              <td>2.45</td>
+              <td>79.2 <span class="ci">[74.3, 84.1]</span></td>
+            </tr>
+            <tr>
+              <td>Hallo</td>
+              <td>0.3912</td>
+              <td>0.9331</td>
+              <td>0.9364</td>
+              <td>2.38</td>
+              <td>75.4 <span class="ci">[70.1, 80.7]</span></td>
+            </tr>
+            <tr>
+              <td>Hallo3</td>
+              <td>0.4045</td>
+              <td>0.9389</td>
+              <td>0.9409</td>
+              <td>2.21</td>
+              <td>72.8 <span class="ci">[67.2, 78.4]</span></td>
+            </tr>
+            <tr>
+              <td>FaceShot</td>
+              <td>0.4178</td>
+              <td>0.9439</td>
+              <td>0.9455</td>
+              <td>2.15</td>
+              <td>68.1 <span class="ci">[62.4, 73.8]</span></td>
+            </tr>
+            <tr>
+              <td>SVDP</td>
+              <td>0.4310</td>
+              <td>0.9485</td>
+              <td>0.9486</td>
+              <td>2.08</td>
+              <td>64.3 <span class="ci">[58.5, 70.1]</span></td>
+            </tr>
+            <tr>
+              <td>FactorPortrait</td>
+              <td>0.4343</td>
+              <td>0.9491</td>
+              <td>0.9459</td>
+              <td>2.10</td>
+              <td>61.7 <span class="ci">[55.9, 67.5]</span></td>
+            </tr>
+            <tr class="is-ours">
+              <td>EMG (ours)</td>
+              <td>0.4576</td>
+              <td>0.9558</td>
+              <td>0.9591</td>
+              <td>1.52</td>
+              <td>94.4 <span class="ci">[89.0, 99.7]</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Efficiency -->
+  <section class="section" style="padding-top: 0;">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Constant-time motion supervision</h2>
+      <div class="content has-text-justified">
+        <p>
+          Sequential flow estimation scales linearly with sequence length and bottlenecks training.
+          Because Eulerian fields depend only on adjacent pairs, EMG estimates every field in one batched
+          pass &mdash; per-iteration time is flat in <em>T</em>.
+        </p>
+      </div>
+      <div class="box">
+        <h3 class="title is-5" style="margin-bottom: 0.2rem;">Per-iteration training time</h3>
+        <p class="media-caption" style="margin-top:0;">milliseconds per iteration vs. sequence length T &middot;
+          4&times; NVIDIA H200</p>
+        <div class="chart-legend">
+          <span><span class="sw" style="background:#c77414"></span>Sequential flow (baseline)</span>
+          <span><span class="sw" style="background:#0a9484"></span>Parallel flow (ours)</span>
+        </div>
+        <svg id="effchart" viewBox="0 0 760 360" role="img"
+          aria-label="Sequential flow grows linearly from 105 to 630 ms per iteration as T grows 8 to 48; parallel flow stays near 110-128 ms."></svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- BibTeX -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title">BibTeX</h2>
+      <pre><code>@article{nguyen2026eulerian,
+    title={Eulerian Motion Guidance: Robust Image Animation via Bidirectional Geometric Consistency},
+    author={Nguyen, Thong and Le, Khoi M and Nguyen, Cong-Duy and Tuan, Luu Anh and Ng, See-Kiong and Miao, Chunyan},
+    journal={arXiv preprint arXiv:2605.06280},
+    year={2026}
+}</code></pre>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="content has-text-centered">
+        <a class="icon-link" href="static/paper.pdf"><i class="fas fa-file-pdf"></i></a>
+        <a class="icon-link" href="https://github.com" class="external-link"><i class="fab fa-github"></i></a>
+      </div>
+
+      <!-- ============================================================
+           MapMyVisitors visitor map.
+           Replace PLACEHOLDER_ID below with the id from YOUR snippet at
+           https://mapmyvisitors.com/ (Dashboard -> "Get code").
+           The snippet they give you looks like:
+             <script id="mapmyvisitors" src="https://mapmyvisitors.com/map.js?d=XXXX&cl=ffffff&w=a"></script>
+           Paste your XXXX value in place of PLACEHOLDER_ID (both the link and
+           the script src), or replace this whole block with their snippet.
+           ============================================================ -->
+      <div class="content has-text-centered" style="margin-top: 1rem;">
+        <a href="https://mapmyvisitors.com/web/PLACEHOLDER_ID" title="Visitor map" target="_blank" rel="noopener">
+          <img src="https://mapmyvisitors.com/map.png?d=PLACEHOLDER_ID&cl=ffffff"
+               alt="Visitor map" style="max-width: 220px; border: 0;">
+        </a>
+        <script type="text/javascript" id="mapmyvisitors"
+                src="https://mapmyvisitors.com/map.js?d=PLACEHOLDER_ID&cl=ffffff&w=a"></script>
+      </div>
+
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              This website is licensed under a
+              <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons
+                Attribution-ShareAlike 4.0 International License</a>.
+            </p>
+            <p>
+              This page borrows the <a href="https://github.com/nerfies/nerfies.github.io">source code</a>
+              of the Nerfies project page. We thank the authors for open-sourcing their template.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ---- Overview: animated Lagrangian vs Eulerian demo ----
+    (function () {
+      "use strict";
+      var lagC = document.getElementById("lagCanvas"), eulC = document.getElementById("eulCanvas");
+      if (!lagC || !eulC) return;
+      var lagErr = document.getElementById("lagErr"), eulErr = document.getElementById("eulErr");
+      var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var amber = "#c77414", teal = "#0a9484", surface = "#ffffff", inkMut = "rgba(120,130,145,0.9)";
+      var demoVisible = false, demoT = 0;
+
+      function pathPoint(t) { return { x: 260 + 168 * Math.cos(t), y: 165 + 92 * Math.sin(2 * t) }; }
+      function arrow(g, x1, y1, x2, y2, color, widthPx) {
+        var dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy);
+        if (len < 1) return;
+        var ux = dx / len, uy = dy / len, hs = Math.min(9, 4 + len * 0.03);
+        g.strokeStyle = color; g.fillStyle = color; g.lineWidth = widthPx; g.lineCap = "round";
+        g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2 - ux * hs, y2 - uy * hs); g.stroke();
+        g.beginPath(); g.moveTo(x2, y2);
+        g.lineTo(x2 - ux * hs - uy * hs * 0.55, y2 - uy * hs + ux * hs * 0.55);
+        g.lineTo(x2 - ux * hs + uy * hs * 0.55, y2 - uy * hs - ux * hs * 0.55);
+        g.closePath(); g.fill();
+      }
+      function drawDemoBase(g) {
+        g.clearRect(0, 0, 520, 330);
+        g.strokeStyle = "rgba(128,140,155,0.22)"; g.lineWidth = 1.5;
+        g.beginPath();
+        for (var a = 0; a <= Math.PI * 2 + 0.05; a += 0.05) {
+          var q = pathPoint(a); if (a === 0) g.moveTo(q.x, q.y); else g.lineTo(q.x, q.y);
+        }
+        g.stroke();
+      }
+      function dot(g, x, y, r, fill, ring) {
+        g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fillStyle = fill; g.fill();
+        if (ring) { g.lineWidth = 2; g.strokeStyle = ring; g.stroke(); }
+      }
+      function demoStep() {
+        if (!demoVisible || reduceMotion) return;
+        demoT += 0.012;
+        var t = demoT % (Math.PI * 2);
+        var p0 = pathPoint(0), pt = pathPoint(t);
+        var g = lagC.getContext("2d");
+        drawDemoBase(g);
+        var dist = Math.hypot(pt.x - p0.x, pt.y - p0.y), noise = dist * 0.14;
+        g.save(); g.globalAlpha = 0.16; g.fillStyle = amber;
+        g.beginPath(); g.moveTo(p0.x, p0.y);
+        var mx = (p0.x + pt.x) / 2, my = (p0.y + pt.y) / 2;
+        var ndx = -(pt.y - p0.y), ndy = (pt.x - p0.x), nl = Math.hypot(ndx, ndy) || 1; ndx /= nl; ndy /= nl;
+        g.quadraticCurveTo(mx + ndx * noise, my + ndy * noise, pt.x, pt.y);
+        g.quadraticCurveTo(mx - ndx * noise, my - ndy * noise, p0.x, p0.y);
+        g.fill(); g.restore();
+        var jx = pt.x + ndx * Math.sin(demoT * 7.3) * noise * 0.7;
+        var jy = pt.y + ndy * Math.cos(demoT * 6.1) * noise * 0.7;
+        arrow(g, p0.x, p0.y, jx, jy, amber, 2.4);
+        dot(g, p0.x, p0.y, 6, surface, amber);
+        g.font = "500 12px ui-monospace,Menlo,monospace"; g.fillStyle = inkMut;
+        g.fillText("I₀", p0.x + 11, p0.y + 4);
+        dot(g, pt.x, pt.y, 5, amber, null);
+        g.fillText("Iₜ", pt.x + 11, pt.y + 4);
+        lagErr.style.width = Math.min(100, 8 + (dist / 340) * 92) + "%";
+
+        g = eulC.getContext("2d");
+        drawDemoBase(g);
+        var hops = 26, span = 0.55;
+        for (var i = hops; i >= 1; i--) {
+          var t1 = t - span * (i / hops), t2 = t - span * ((i - 1) / hops);
+          if (t1 < 0) continue;
+          var a1 = pathPoint(t1), a2 = pathPoint(t2);
+          g.globalAlpha = 0.12 + 0.7 * (1 - i / hops);
+          arrow(g, a1.x, a1.y, a2.x, a2.y, teal, 2.2);
+        }
+        g.globalAlpha = 1;
+        var prev = pathPoint(Math.max(0, t - 0.09));
+        arrow(g, prev.x, prev.y, pt.x, pt.y, teal, 2.6);
+        dot(g, p0.x, p0.y, 6, surface, "rgba(128,140,155,0.7)");
+        g.font = "500 12px ui-monospace,Menlo,monospace"; g.fillStyle = inkMut;
+        g.fillText("I₀", p0.x + 11, p0.y + 4);
+        dot(g, pt.x, pt.y, 5, teal, null);
+        g.fillText("Iₜ₊₁", pt.x + 11, pt.y + 4);
+        eulErr.style.width = "9%";
+        requestAnimationFrame(demoStep);
+      }
+      function drawDemoStatic() {
+        var t = 2.2, p0 = pathPoint(0), pt = pathPoint(t);
+        var g = lagC.getContext("2d"); drawDemoBase(g); arrow(g, p0.x, p0.y, pt.x, pt.y, amber, 2.4);
+        g = eulC.getContext("2d"); drawDemoBase(g);
+        var prev = pathPoint(t - 0.12); arrow(g, prev.x, prev.y, pt.x, pt.y, teal, 2.6);
+        lagErr.style.width = "72%"; eulErr.style.width = "9%";
+      }
+      if (reduceMotion) { drawDemoStatic(); }
+      else if ("IntersectionObserver" in window) {
+        new IntersectionObserver(function (en) {
+          var was = demoVisible; demoVisible = en[0].isIntersecting;
+          if (demoVisible && !was) requestAnimationFrame(demoStep);
+        }, { threshold: 0.15 }).observe(document.getElementById("demo"));
+      } else { demoVisible = true; requestAnimationFrame(demoStep); }
+    })();
+
+    (function () {
+      "use strict";
+      var svg = document.getElementById("effchart");
+      if (!svg) return;
+      var NS = "http://www.w3.org/2000/svg";
+      var seq = [[8, 105], [16, 210], [24, 315], [32, 420], [40, 525], [48, 630]];
+      var par = [[8, 110], [16, 112], [24, 115], [32, 118], [40, 122], [48, 128]];
+      var M = { l: 56, r: 150, t: 34, b: 44 }, CW = 760, CH = 360;
+      function sx(v) { return M.l + (v - 8) / (48 - 8) * (CW - M.l - M.r); }
+      function sy(v) { return CH - M.b - (v / 700) * (CH - M.t - M.b); }
+      function el(n, a, t) { var e = document.createElementNS(NS, n); for (var k in a) e.setAttribute(k, a[k]); if (t != null) e.textContent = t; svg.appendChild(e); return e; }
+      [0, 100, 200, 300, 400, 500, 600, 700].forEach(function (v) {
+        el("line", { x1: M.l, x2: CW - M.r, y1: sy(v), y2: sy(v), "class": "grid", "stroke-opacity": v === 0 ? 1 : 0.55 });
+        el("text", { x: M.l - 8, y: sy(v) + 4, "text-anchor": "end" }, v);
+      });
+      [8, 16, 24, 32, 40, 48].forEach(function (v) { el("text", { x: sx(v), y: CH - M.b + 20, "text-anchor": "middle" }, v); });
+      el("text", { x: M.l - 8, y: M.t - 14, "text-anchor": "end" }, "ms/iter");
+      el("text", { x: (M.l + CW - M.r) / 2, y: CH - 6, "text-anchor": "middle" }, "sequence length T");
+      function line(data, color, label, sub) {
+        el("polyline", { points: data.map(function (d) { return sx(d[0]) + "," + sy(d[1]); }).join(" "), fill: "none", stroke: color, "stroke-width": 2, "stroke-linecap": "round", "stroke-linejoin": "round" });
+        data.forEach(function (d, i) { el("circle", { cx: sx(d[0]), cy: sy(d[1]), r: i === data.length - 1 ? 4.5 : 3, fill: color, stroke: "#fff", "stroke-width": 2 }); });
+        var last = data[data.length - 1];
+        el("text", { x: sx(last[0]) + 12, y: sy(last[1]) + 4, fill: color, "class": "dl" }, label);
+        if (sub) el("text", { x: sx(last[0]) + 12, y: sy(last[1]) + 18, fill: "#999", "class": "dl" }, sub);
+      }
+      line(seq, "#c77414", "Sequential", "O(T)");
+      line(par, "#0a9484", "Parallel (ours)", "O(1)");
+    })();
+  </script>
+
+</body>
+
+</html>
