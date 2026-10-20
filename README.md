@@ -12,7 +12,6 @@ academic project-page layout.
 index.html            page markup (Nerfies/Bulma structure)
 static/css/bulma.min.css   vendored Bulma framework
 static/css/index.css       Nerfies base styles + this page's additions
-static/paper.pdf      compiled paper
 static/images/        method diagrams (paradigm, BGC)
 static/videos/        looping result GIFs (see "Video slots" below)
 ```
@@ -74,13 +73,13 @@ so the loops stay synchronized.
 3. In the repo: Settings → Pages → Source: `main` branch, `/ (root)`.
    The page appears at `https://<your-handle>.github.io/emg2026/`.
 
-## Before publishing — fill in the placeholders
+## Links
 
-- **Result videos** in `static/videos/` (see table above).
-- **arXiv button** (`index.html`, hero): replace `https://arxiv.org` with the
-  real abstract URL once the preprint is live.
-- **Code button**: replace `https://github.com` with the code repository URL.
-- **BibTeX**: update once the DOI / final proceedings entry is known.
+- **Paper**: https://arxiv.org/pdf/2605.06280
+- **arXiv**: https://arxiv.org/abs/2605.06280
+- **Code**: https://github.com/nguyentthong/eulerian_motion_guidance
+- **BibTeX**: currently cites the arXiv preprint.
+  Switch it to the ACM MM proceedings entry once the DOI is available.
 
 Fonts load from Google Fonts (Spectral, Schibsted Grotesk, Spline Sans Mono);
 if you need the page fully self-hosted, download the woff2 files and swap the
